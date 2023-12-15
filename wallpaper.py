@@ -2,8 +2,6 @@
 import os
 import re
 import ctypes
-import winreg
-import pywintypes
 import win32con
 from openai import OpenAI
 import requests
@@ -31,7 +29,7 @@ def pobierz_i_zapisz_obraz_z_url(url, folder,name_of_file):
         odpowiedz = requests.get(url)
         if odpowiedz.status_code == 200:
             obraz = Image.open(BytesIO(odpowiedz.content))
-            obraz.save(folder+name_of_file)
+            obraz.save(folder+"/"+name_of_file)
             return True
         else:
             return False
@@ -40,19 +38,19 @@ def pobierz_i_zapisz_obraz_z_url(url, folder,name_of_file):
         
 def ustaw_tapete(folder, name_of_file,resize = False):
     try:
-        if not os.path.exists(folder+name_of_file):
+        if not os.path.exists(folder+"/"+name_of_file):
             return False
         
-        obraz = Image.open(folder+name_of_file)
+        obraz = Image.open(folder+"/"+name_of_file)
         if resize:
             width_of_screen, height_of_screen = ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1)
             obraz = obraz.resize((width_of_screen, height_of_screen))
-            obraz.save(folder+"resized_"+name_of_file) 
-            ctypes.windll.user32.SystemParametersInfoW(win32con.SPI_SETDESKWALLPAPER, 0, folder + "resized_"+name_of_file, win32con.SPIF_UPDATEINIFILE | win32con.SPIF_SENDCHANGE)
+            obraz.save(folder+"/resized_"+name_of_file) 
+            ctypes.windll.user32.SystemParametersInfoW(win32con.SPI_SETDESKWALLPAPER, 0, folder + "/resized_"+name_of_file, win32con.SPIF_UPDATEINIFILE | win32con.SPIF_SENDCHANGE)
         else:
-            ctypes.windll.user32.SystemParametersInfoW(win32con.SPI_SETDESKWALLPAPER, 0, folder + name_of_file, win32con.SPIF_UPDATEINIFILE | win32con.SPIF_SENDCHANGE)
+            ctypes.windll.user32.SystemParametersInfoW(win32con.SPI_SETDESKWALLPAPER, 0, folder +"/"+ name_of_file, win32con.SPIF_UPDATEINIFILE | win32con.SPIF_SENDCHANGE)
         return True
-    except pywintypes.error as e:
+    except:
         return False
         
 def znajdz_najwieksza_liczbe_w_nazwach_plikow(folder):
