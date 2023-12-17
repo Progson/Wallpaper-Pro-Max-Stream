@@ -1,0 +1,19 @@
+zapisuj donejty jakie dostaniesz nie powtarzaj
+zapisuj donejty jak sie jakiś pojawi
+zapisuj donejty jako kwota_ip.txt
+przenoś je do folderu z generatorem\
+generator pobiera pokolei obrazki
+wieksza kwota wiekszy czas na ekrnie
+
+
+[wizualnie]
+do momentu pojawienia sie nowej tapety twórca i jego prompt jest na ekranie
+nowa tapeta się pojawia nazwa użytkownika wsuwa się na górę, stary użytkowanik znika
+pojawia sie prompt nowego
+po prawej stronie kolejka do sceny
+
+[dalszy rozwój]
+co X czasu jest losowanie jakies tapety z czatu
+usuwanie tapet z kompa jak bedzie ich za duzo
+odpalenie streama na jakimś kompie co będzie stał i streamował
+żeby to już nawet tapeta nie była
