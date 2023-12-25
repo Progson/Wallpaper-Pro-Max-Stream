@@ -1,3 +1,20 @@
+import sys,os
+import tkinter as tk
+from tkinter import messagebox
+
+
+root = tk.Tk()
+root.withdraw() 
+
+prompt = ''
+if len(sys.argv) > 1:
+        donationID = sys.argv[1]
+        prompt = sys.argv[2]
+        messagebox.showinfo("Komunikat", prompt)
+root.destroy()
+exit()
+
+
 import wallpaper as wp
 import os
 import sys

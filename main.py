@@ -1,3 +1,4 @@
+
 import requests
 import sys
 import json
@@ -115,9 +116,9 @@ def zapisz_elementy_json(donation_dict, katalog_donacji="donejty"):
         if os.path.isfile(source_path):
             destination_path = os.path.join(destination_folder, filename)
             shutil.move(source_path, destination_path)
-            print(f'Przeniesiono: {source_path} do {destination_path}')'''
+            print(f'Przeniesiono: {source_path} do {destination_path}')
 
-
+'''
 def generate_wallpaper(donation_id,prompt):
     path_to_generate_wallpaper_script = os.path.join(os.path.dirname(os.path.abspath(__file__)) ,"generate_wallpaper.py")
     result = subprocess.run([sys.executable, path_to_generate_wallpaper_script,str(donation_id), str(prompt)], capture_output=True, text=True)
