@@ -2,16 +2,34 @@ import sys,os
 import tkinter as tk
 from tkinter import messagebox
 
+def connect_to_server():
+    print('connect')
+    pass
 
-root = tk.Tk()
-root.withdraw() 
+def disconnect_from_server():
+    # Add your disconnection code here
+    pass
 
-prompt = ''
-if len(sys.argv) > 1:
-        donationID = sys.argv[1]
-        prompt = sys.argv[2]
-        messagebox.showinfo("Komunikat", prompt)
-root.destroy()
+def perform_auto_action():
+    # Add code for automatic action here
+    pass
+
+app = tk.Tk()
+app.title("Menu App")
+
+connect_button = tk.Button(app, text="Connect to Server", command=connect_to_server)
+connect_button.pack()
+
+disconnect_button = tk.Button(app, text="Disconnect from Server", command=disconnect_from_server)
+disconnect_button.pack()
+
+auto_action_button = tk.Button(app, text="Automatically Do Something", command=perform_auto_action)
+auto_action_button.pack()
+
+quit_button = tk.Button(app, text="Quit", command=app.quit)
+quit_button.pack()
+
+app.mainloop()
 exit()
 
 

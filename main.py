@@ -1,4 +1,3 @@
-
 import requests
 import sys
 import json
@@ -42,13 +41,6 @@ def get_socket_token(access_token):
 
 
 sio = socketio.Client(logger=True, engineio_logger=True)
-@sio.event
-def connect():
-    print('Connection established')
-
-@sio.event
-def disconnect():
-    print('Disconnected from server')
 
 @sio.on('event')
 def on_event(eventData):
@@ -58,13 +50,12 @@ def on_event(eventData):
         donation_message = donation_data['message']
         donation_amount = donation_data['amount'] 
         donation_currency = donation_data['currency']
-        generate_wallpaper(donation_id,donation_message)
-
-
+        #generate_wallpaper(donation_id,donation_message)
+        run_script_in_this_folder("msg_box.py", [donation_message])
+        
 @sio.on('connect')
 def connect():
-    print('p z serwerem socket.io')
-
+    print("connected")
 
 @sio.on('message')
 def event(data):
@@ -123,7 +114,17 @@ def generate_wallpaper(donation_id,prompt):
     path_to_generate_wallpaper_script = os.path.join(os.path.dirname(os.path.abspath(__file__)) ,"generate_wallpaper.py")
     result = subprocess.run([sys.executable, path_to_generate_wallpaper_script,str(donation_id), str(prompt)], capture_output=True, text=True)
     return result.returncode        
-       
+
+def run_script(script_path,additional_arguments_values = []):
+    script_values = additional_arguments_values
+    script_values.insert(0, script_path)
+    script_values.insert(0, sys.executable)
+    result = subprocess.run(script_values, capture_output=True, text=True)
+    return result, result.returncode  
+
+def run_script_in_this_folder(name_of_script, additional_arguments_values = []):
+    path_to_generate_wallpaper_script = os.path.join(os.path.dirname(os.path.abspath(__file__)) ,name_of_script)
+    run_script(path_to_generate_wallpaper_script,additional_arguments_values)
     
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -138,7 +139,7 @@ if __name__ == "__main__":
             sio.wait()
         except KeyboardInterrupt:
             pass
-
+            
     else:
         print("Nie otrzymano kodu")
 
