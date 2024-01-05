@@ -1,5 +1,6 @@
 import sys
 from openai import OpenAI
+
 if(len(sys.argv)!=2):
     print("Example usage: python name_of_script.py \"two dogs with a cat on the mountain\"")
     sys.exit(2)
