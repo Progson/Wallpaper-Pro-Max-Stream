@@ -81,18 +81,9 @@ def get_socket_token(access_token):
 def on_event(eventData):
     if eventData['type'] == 'donation':
         donation_data = eventData['message'][0]  
-        donation_id = donation_data['id'] 
-        donation_name = donation_data['name'] 
-        donation_message = donation_data['message']
-        donation_amount = donation_data['amount'] 
-        result = run_script_in_this_folder("generate_wallpaper_from_prompt.py", [donation_message])
-        if(result.returncode == 0):
-            url = result.stdout.rstrip('\n')
-            access_donations("append",[donation_id,donation_name,donation_amount,donation_message,url])
-            print(access_donations("copy"))
-        else:
-            ...
-            '''jak jest blad np safty policy'''
+        recive_donation(donation_data)
+        
+        
         
 @sio.on('connect')
 def connect():
@@ -165,13 +156,28 @@ def start_downloading_and_setting_wallpaper():
     download_set_thread = threading.Thread(target=download_first_donation_and_set_it)
     download_set_thread.start()
     
+def recive_donation_thread(donation_data):
+    donation_id = donation_data['id'] 
+    donation_name = donation_data['name'] 
+    donation_message = donation_data['message']
+    donation_amount = donation_data['amount']
+    result = run_script_in_this_folder("generate_wallpaper_from_prompt.py", [donation_message])
+    if(result.returncode == 0):
+        url = result.stdout.rstrip('\n')
+        access_donations("append",[donation_id,donation_name,donation_amount,donation_message,url])
+        print(access_donations("copy"))
+
+def recive_donation(donation_data):
+    download_set_thread = threading.Thread(target=recive_donation_thread, args=(donation_data ,))
+    download_set_thread.start()
+    
     
 if __name__ == "__main__":
     code = get_code_from_file("code.txt") #sys.argv[1]
     access_token , socket_token = get_tokens(code)
     start_connection(socket_token)
     start_downloading_and_setting_wallpaper()
-    time.sleep(30)
+    time.sleep(120)
     sio.disconnect()
 
     
