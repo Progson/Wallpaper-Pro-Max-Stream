@@ -4,7 +4,7 @@ import sys
 
 root = tk.Tk()
 root.withdraw()  # Ukryj główne okno
-komunikat = "żyje"
+komunikat = "alive"
 if(len(sys.argv) > 1):
     komunikat = sys.argv[1]
 messagebox.showinfo("Komunikat", komunikat)
