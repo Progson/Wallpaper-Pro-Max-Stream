@@ -17,4 +17,13 @@ def msgbox(text):
     run_script_in_this_folder("msg_box.py",additional_arguments_values=[text])
     
 result = run_script_in_this_folder("generate_wallpaper_from_prompt.py", ["donation_message"])
-print(result.stdout)
+path_to_folder_with_wallpapers = os.path.join(os.path.dirname(os.path.abspath(__name__)) ,"generated_wallpapers")
+url = result.stdout
+url = "https://img.freepik.com/premium-zdjecie/pies-animowany-obrazek-generatywna-sztuczna-inteligencja_786688-641.jpg"
+saving_result = run_script_in_this_folder("save_image_from_url.py", [path_to_folder_with_wallpapers,"testy.jpg",url])
+print(saving_result)
+wallpaper_path = saving_result.stdout.rstrip('\n')
+setting_result = run_script_in_this_folder("set_image_as_wallpaper.py", [wallpaper_path])
+print(setting_result)
+           
+            

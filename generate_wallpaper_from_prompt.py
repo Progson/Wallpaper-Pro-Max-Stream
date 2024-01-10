@@ -5,7 +5,7 @@ if(len(sys.argv)!=2):
     print("Example usage: python name_of_script.py \"two dogs with a cat on the mountain\"")
     sys.exit(2)
 
-print("https://sdpl.b-cdn.net/17158-large_default/obrazek-obrazki-10paz.jpg")
+print("https://img.freepik.com/premium-zdjecie/pies-animowany-obrazek-generatywna-sztuczna-inteligencja_786688-641.jpg")
 exit(0)
 
 def generate_image_and_url(givenPrompt):

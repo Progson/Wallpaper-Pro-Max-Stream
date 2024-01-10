@@ -9,14 +9,14 @@ from tkinter import messagebox
 import threading
 import time
 
-if len(sys.argv) == 1:
+'''if len(sys.argv) == 1:
     print("Nie otrzymano kodu")
-    sys.exit(2)
+    sys.exit(2)'''
 
 client_id = os.getenv("STREAMLAB_TAPETYPRO_CLIENT_ID")
 client_secret = os.getenv("STREAMLAB_TAPETYPRO_CLIENT_SECRET")
 sio = socketio.Client(logger=True, engineio_logger=True)
-seocnds_between_wallpapers = 10
+seocnds_between_wallpapers = 2
 
 
 
@@ -28,7 +28,7 @@ seocnds_between_wallpapers = 10
 '''
 
 donations = [] #id,name,amount,prompt,url
-donations_lock = threading.Lock
+donations_lock = threading.Lock()
 
 def access_donations(action="",args =[]):
     with donations_lock:
@@ -43,6 +43,9 @@ def access_donations(action="",args =[]):
             donations.append(args)
         if action == "read":
             return donations[args[0]]
+        if action == "copy":
+            copy = donations
+            return copy
     
 def get_access_token(code): 
     data = {
@@ -70,7 +73,7 @@ def get_socket_token(access_token):
         response_dict = json.loads(response.text)
         return response_dict.get('socket_token', None)
     except json.JSONDecodeError as e:
-        print("nie dziala")
+        print("socket token error ")
         print(response.text)
         return None
 
@@ -84,8 +87,9 @@ def on_event(eventData):
         donation_amount = donation_data['amount'] 
         result = run_script_in_this_folder("generate_wallpaper_from_prompt.py", [donation_message])
         if(result.returncode == 0):
-            url = result.stdout
+            url = result.stdout.rstrip('\n')
             access_donations("append",[donation_id,donation_name,donation_amount,donation_message,url])
+            print(access_donations("copy"))
         else:
             ...
             '''jak jest blad np safty policy'''
@@ -107,8 +111,8 @@ def run_script(script_path,additional_arguments_values = []):
     return result
 
 def run_script_in_this_folder(name_of_script, additional_arguments_values = []):
-    path_to_generate_wallpaper_script = os.path.join(os.path.dirname(os.path.abspath(__file__)) ,name_of_script)
-    return run_script(path_to_generate_wallpaper_script,additional_arguments_values)
+    path_to_script = os.path.join(os.path.dirname(os.path.abspath(__name__)) ,name_of_script)
+    return run_script(path_to_script,additional_arguments_values)
 
 def msgbox(text):
     run_script_in_this_folder("msg_box.py",additional_arguments_values=[text])
@@ -121,42 +125,53 @@ def connect_and_wait(socket_token):
     sio.connect(f'https://sockets.streamlabs.com?token={socket_token}', transports=['websocket'])
     sio.wait()
     
-def get_tokens():
-    code = sys.argv[1]
+def get_code_from_file(file_name):
+    try:
+        with open(file_name, "r") as file:
+            content = file.read()
+            return content
+    except FileNotFoundError:
+        print("Plik 'code.txt' nie istnieje.")  
+          
+def get_tokens(code):
     access_token = get_access_token(code)
     socket_token = get_socket_token(access_token)
     return access_token,socket_token
     
-def download_first_donation_and_set_it(seconds = 10):
+def download_first_donation_and_set_it():
     while True:
         if(access_donations(action="get_length") > 0):
-            donation = access_donations(action="read",args=[0])
-            path_to_folder_with_wallpapers = os.path.join(os.path.dirname(os.path.abspath(__file__)) ,"generated_wallpapers")
-   
-            saving_result = run_script_in_this_folder("save_image_from_url.py", [path_to_folder_with_wallpapers,donation[0],donation[4]])
+            donation = access_donations(action="read",args=[0])            
+            path_to_folder_with_wallpapers = os.path.join(os.path.dirname(os.path.abspath(__name__)) ,"generated_wallpapers")
+                
+            saving_result = run_script_in_this_folder("save_image_from_url.py", [path_to_folder_with_wallpapers,str(donation[0])+".jpg",donation[4]])
+            print(saving_result)
             if(saving_result.returncode != 0):
                 continue
-            wallpaper_path = saving_result.stdout
+            wallpaper_path = saving_result.stdout.rstrip('\n')
             setting_result = run_script_in_this_folder("set_image_as_wallpaper.py", [wallpaper_path])
+            print(setting_result)
             if(setting_result.returncode != 0):
                 continue
             access_donations(action="delete")
-            time.sleep(seconds)
+            print(access_donations("copy"))
+            time.sleep(seocnds_between_wallpapers)
 
 def start_connection(socket_token):
     connection_thread = threading.Thread(target=connect_and_wait, args=(socket_token ,))
     connection_thread.start()
     
 def start_downloading_and_setting_wallpaper():
-    download_set_thread = threading.Thread(target=download_first_donation_and_set_it, args=(seocnds_between_wallpapers))
+    download_set_thread = threading.Thread(target=download_first_donation_and_set_it)
     download_set_thread.start()
     
     
 if __name__ == "__main__":
-    accces_token , socket_token = get_tokens()
+    code = get_code_from_file("code.txt") #sys.argv[1]
+    access_token , socket_token = get_tokens(code)
     start_connection(socket_token)
     start_downloading_and_setting_wallpaper()
-    time.sleep(120)
+    time.sleep(30)
     sio.disconnect()
 
     
